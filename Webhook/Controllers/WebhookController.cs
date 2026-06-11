@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Webhook.Data;
+using Webhook.DTO;
+using Webhook.Interface;
 using Webhook.Model;
+using Webhook.Service;
 
 namespace Webhook.Controllers
 {
@@ -8,40 +11,24 @@ namespace Webhook.Controllers
     [Route("[controller]")]
     public class WebhookController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IWebhookService _webhookService;
+        private readonly IConfiguration _configuration;
 
-        public WebhookController(AppDbContext context)
+        public WebhookController(IWebhookService webhookService, IConfiguration configuration)
         {
-            _context = context;
+            _webhookService = webhookService;
+            _configuration = configuration;
         }
 
         [HttpPost]
-        public IActionResult ReceberPagamentoWebhook()
+        public IActionResult ReceberPagamentoWebhook([FromHeader(Name = "X-Api-Key")] string apiKey, [FromBody] PagamentoWebhookDto dto)
         {
-            var log = new LogEventoBruto
+            if (apiKey != _configuration["WebhookApiKey"])
             {
-                Id = Guid.NewGuid(),
-                IdTransacao = Guid.NewGuid().ToString(),
-                IdContrato = "CTR001",
-                Valor = 100,
-                DataPagamento = DateTime.UtcNow,
-                Status = "Pago"
-            };
+                return Unauthorized();
+            }
 
-            _context.LogEventoBruto.Add(log);
-            _context.SaveChanges();
-
-            return Ok(new
-            {
-                Mensagem = "Registro salvo com sucesso",
-                Quantidade = _context.LogEventoBruto.Count()
-            });
-        }
-
-        [HttpGet]
-        public IActionResult Obter()
-        {
-            return Ok(_context.LogEventoBruto.ToList());
+            return Ok(_webhookService.ReceberPagamentoWebhook(dto));
         }
     }
 }

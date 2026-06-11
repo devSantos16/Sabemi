@@ -1,6 +1,8 @@
 
 using Microsoft.EntityFrameworkCore;
 using Webhook.Data;
+using Webhook.Interface;
+using Webhook.Service;
 
 namespace Webhook
 {
@@ -11,6 +13,7 @@ namespace Webhook
             var builder = WebApplication.CreateBuilder(args);
             
             builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("WebhookDb"));
+            builder.Services.AddScoped<IWebhookService, WebhookService>();
 
             builder.Services.AddControllers();
 
