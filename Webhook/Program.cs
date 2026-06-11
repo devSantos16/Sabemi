@@ -1,4 +1,7 @@
 
+using Microsoft.EntityFrameworkCore;
+using Webhook.Data;
+
 namespace Webhook
 {
     public class Program
@@ -6,8 +9,8 @@ namespace Webhook
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
+            
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("WebhookDb"));
 
             builder.Services.AddControllers();
 
