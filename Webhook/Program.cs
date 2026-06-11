@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Webhook.Data;
 using Webhook.Interface;
 using Webhook.Service;
+using Webhook.Workers;
 
 namespace Webhook
 {
@@ -14,6 +15,7 @@ namespace Webhook
             
             builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("WebhookDb"));
             builder.Services.AddScoped<IWebhookService, WebhookService>();
+            builder.Services.AddHostedService<PagamentoWorker>();
 
             builder.Services.AddControllers();
 

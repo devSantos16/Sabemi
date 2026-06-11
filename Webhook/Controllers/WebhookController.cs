@@ -8,7 +8,7 @@ using Webhook.Service;
 namespace Webhook.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("webhooks/pagamento")]
     public class WebhookController : ControllerBase
     {
         private readonly IWebhookService _webhookService;

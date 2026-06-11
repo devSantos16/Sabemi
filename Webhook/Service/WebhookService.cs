@@ -4,6 +4,7 @@ using Webhook.Data;
 using Webhook.DTO;
 using Webhook.Interface;
 using Webhook.Model;
+using Webhook.Queue;
 
 namespace Webhook.Service
 {
@@ -40,46 +41,8 @@ namespace Webhook.Service
             _context.LogEventoBruto.Add(logEventoBruto);
             await _context.SaveChangesAsync();
 
-            try
-            {
-                StatusContrato contrato = await _context.StatusContrato
-                    .FirstOrDefaultAsync(x => x.IdContrato == dto.IdContrato);
-
-                if (contrato == null)
-                {
-                    contrato = new StatusContrato
-                    {
-                        IdContrato = dto.IdContrato,
-                        Status = dto.Status,
-                        UltimoValorPago = dto.Valor,
-                        DataUltimoPagamento = dto.DataPagamento,
-                        DataUltimaAtualizacao = DateTime.UtcNow
-                    };
-
-                    _context.StatusContrato.Add(contrato);
-                }
-
-                else
-                {
-                    contrato.Status = dto.Status;
-                    contrato.UltimoValorPago = dto.Valor;
-                    contrato.DataUltimoPagamento = dto.DataPagamento;
-                    contrato.DataUltimaAtualizacao = DateTime.UtcNow;
-                }
-
-                logEventoBruto.Processado = true;
-            }
-
-            catch (Exception ex)
-            {
-                logEventoBruto.Processado = false;
-                logEventoBruto.Erro = ex.Message;
-            }
-
-            finally
-            {
-                await _context.SaveChangesAsync();
-            }
+            // Mandar para o worker
+            PagamentoQueue.Eventos.Enqueue(logEventoBruto.Id);
         }
     }
 }
