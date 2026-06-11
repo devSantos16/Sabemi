@@ -5,6 +5,6 @@ namespace Webhook.Interface
 {
     public interface IWebhookService
     {
-        public IActionResult ReceberPagamentoWebhook(PagamentoWebhookDto dto);
+        public Task ReceberPagamentoWebhook(PagamentoWebhookDto dto);
     }
 }

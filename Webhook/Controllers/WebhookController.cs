@@ -21,14 +21,15 @@ namespace Webhook.Controllers
         }
 
         [HttpPost]
-        public IActionResult ReceberPagamentoWebhook([FromHeader(Name = "X-Api-Key")] string apiKey, [FromBody] PagamentoWebhookDto dto)
+        public async Task<ActionResult> ReceberPagamentoWebhook([FromHeader(Name = "X-Api-Key")] string apiKey, [FromBody] PagamentoWebhookDto dto)
         {
             if (apiKey != _configuration["WebhookApiKey"])
             {
                 return Unauthorized();
             }
 
-            return Ok(_webhookService.ReceberPagamentoWebhook(dto));
+            await _webhookService.ReceberPagamentoWebhook(dto);
+            return Ok();
         }
     }
 }
